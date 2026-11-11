@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZooCRUD · ZooKeeper CRUD shell in Go</title>
+    <meta
+      name="description"
+      content="A CRUD shell for ZooKeeper, written in Go. Try the commands in your browser and watch the znode tree change."
+    />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%2334D399'/><text x='50' y='68' font-size='52' text-anchor='middle'>🦁</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+
+    <header class="hero">
+      <div class="hero-badge"><span class="dot"></span> Go compiled to WebAssembly</div>
+      <h1>ZooCRUD</h1>
+      <p class="hero-text">
+        A CRUD shell for <strong>ZooKeeper</strong>, written in Go. ZooKeeper stores data in a tree of
+        <em>znodes</em>, with paths like <code>/zoo/lion</code>. Type commands in the terminal and watch the tree change.
+      </p>
+      <div class="hero-actions">
+        <a class="button button-ghost" href="https://github.com/rahelmartim/go-zookeeper-crud" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+        </a>
+        <button class="button button-primary" id="tour" disabled>▶ Play the tour</button>
+      </div>
+      <p class="note">
+        This demo runs the same command code as the CLI, on an in-memory tree that follows the ZooKeeper rules.
+        The CLI also connects to a real ZooKeeper server.
+      </p>
+    </header>
+
+    <main class="stage">
+      <section class="card terminal" aria-label="Terminal">
+        <div class="terminal-bar">
+          <span class="light red"></span><span class="light yellow"></span><span class="light green"></span>
+          <span class="terminal-title">zoocrud — in-memory</span>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+          <ol class="output" id="output" aria-live="polite"></ol>
+          <form class="prompt" id="prompt">
+            <label for="command" class="prompt-sign">zoocrud&gt;</label>
+            <input id="command" autocomplete="off" spellcheck="false" maxlength="4096" placeholder="Loading…" disabled />
+          </form>
+        </div>
+        <div class="chips" id="chips" aria-label="Example commands"></div>
+      </section>
+
+      <section class="card tree-card" aria-label="Znode tree">
+        <div class="tree-head">
+          <div>
+            <h2>Znode tree</h2>
+            <p class="muted" id="tree-summary">Loading…</p>
+          </div>
+          <div class="legend">
+            <span><i class="swatch created"></i>created</span>
+            <span><i class="swatch updated"></i>updated</span>
+            <span><i class="swatch deleted"></i>deleted</span>
+          </div>
+        </div>
+        <ul class="tree" id="tree"></ul>
+        <p class="hint muted">Click a node to read it.</p>
+      </section>
+    </main>
+
+    <section class="explain">
+      <div class="explain-grid">
+        <article class="card">
+          <h3>Commands</h3>
+          <table class="commands" id="commands"></table>
+        </article>
+        <article class="card">
+          <h3>ZooKeeper rules</h3>
+          <ul class="rules">
+            <li>Every path starts at the root <code>/</code>.</li>
+            <li>The parent of a new node must exist.</li>
+            <li>Every update adds 1 to the version of the node.</li>
+            <li>A node with children cannot be deleted. <code>DELETEC</code> deletes the children first.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Run it with a real ZooKeeper</h3>
+          <pre><code><span class="c-com"># start ZooKeeper</span>
+docker run --rm -p 2181:2181 zookeeper:3.9
+<span class="c-com"># start the shell</span>
+go run ./cmd/zoocrud</code></pre>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      Built with Go and WebAssembly by
+      <a href="https://github.com/rahelmartim" target="_blank" rel="noopener noreferrer">rahelmartim</a>
+    </footer>
+
+    <script src="wasm_exec.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
